@@ -75,10 +75,6 @@ class ScrollBlum {
   }
 
   refresh () {
-    this.rafId = null;
-
-    if (!this.cumulativeHeights) return;
-
     const scrollContainer = $('.scroll-container')[0],
           scrollTop = scrollContainer.scrollTop,
           topGap = $('.top-gap')[0],
