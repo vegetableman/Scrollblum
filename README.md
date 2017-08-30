@@ -6,7 +6,7 @@ The current state of frameworky infinite scroller libraries perplexed the Blum a
 
 ![img](https://raw.githubusercontent.com/vegetableman/Scrollblum/master/scrollblum.gif)
 
-##Example
+## Example
 
 ```js
 
