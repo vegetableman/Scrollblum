@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+.list {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+
+  height: 800px;
+  margin: 0 auto;
+  width: 400px;
+}
+
+.scroll-container {
+  height: 100%;
+  width: 100%
+}
+
+.scroll-item {
+  background: url('./laughing_blum.png');
+  background-size: 80px;
+  background-repeat: no-repeat;
+  background-position-x: 46%;
+  background-position-y: 5px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 5em;
+  height: 150px;
+  width: 100%;
+}
