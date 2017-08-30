@@ -4,7 +4,7 @@ A petite vanilla js infinite scroller.
 
 The current state of frameworky infinite scroller libraries perplexed the Blum and was enough to make the man snap out of his subliminally medicated state, to build a tiny and performant vanilla js infinite scroller.
 
-![img](https://raw.githubusercontent.com/vegetableman/Scrollblum/master/scrollblum.gif)
+![img](https://raw.githubusercontent.com/vegetableman/Scrollblum/master/scrollblum.gif | width=100)
 
 ## Example
 
