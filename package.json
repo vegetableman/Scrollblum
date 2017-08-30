@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "budo example/browser.js --css 'example/style.css' --live --open -- -t babelify",
-    "pre-publish": "browserify index.es6 -t babelify -o index.js"
+    "build": "browserify index.es6 -t babelify -o index.js",
+    "build-global": "browserify index.es6 -t babelify --standalone ScrollBlum > index.js",
+    "pre-publish": "npm run build"
   },
   "author": "vegetableman <vegetablebot@gmail.com>",
   "license": "ISC",
@@ -15,7 +17,8 @@
     "babelify": "^7.3.0",
     "browserify": "^14.4.0",
     "budo": "^10.0.4",
-    "domready": "^1.0.8"
+    "domready": "^1.0.8",
+    "windowify": "^0.3.0"
   },
   "dependencies": {
     "css-styler": "^1.0.0",
