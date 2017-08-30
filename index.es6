@@ -157,7 +157,7 @@ class ScrollBlum {
 export default (() => {
     return (container, opts = {}) => {
       if (!container)
-        throw new Error('Please provider a container');
+        throw new Error('Please provide a container');
 
       return new ScrollBlum($(container), opts);
     };
