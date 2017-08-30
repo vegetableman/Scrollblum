@@ -6,6 +6,7 @@ The current state of frameworky infinite scroller libraries perplexed the Blum a
 
 <img src=https://raw.githubusercontent.com/vegetableman/Scrollblum/master/scrollblum.gif width="400"/>
 
+
 ## Example
 
 ```js
@@ -22,6 +23,14 @@ const sb = scrollBlum('.list', {
 
 // Used to update the row height on an index
 sb.setRowHeight(10, 200);
+```
+
+## Install
+
+```js
+
+npm i scrollblum --save
+
 ```
 
 ## Usage
