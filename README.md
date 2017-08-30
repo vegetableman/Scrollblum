@@ -33,6 +33,14 @@ npm i scrollblum --save
 
 ```
 
+## Run Example
+
+``` js
+
+npm start
+
+```
+
 ## Usage
 
 ```js
