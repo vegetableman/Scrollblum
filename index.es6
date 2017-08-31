@@ -31,7 +31,7 @@ class ScrollBlum {
     this.rowsCount = opts.rowsCount;
     this.rowRenderer = opts.rowRenderer;
     this.rowHeight = opts.rowHeight;
-    this.overscanCount = opts.overscanCount;
+    this.overscanCount = opts.overscanCount || 0;
     this.rowHeights = this.cumulativeHeights = new Int32Array(this.rowsCount);
     this.rowHeights.fill(this.rowHeight);
     this.rafId = null;
