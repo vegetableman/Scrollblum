@@ -31,10 +31,9 @@ class ScrollBlum {
     this.rowsCount = opts.rowsCount;
     this.rowRenderer = opts.rowRenderer;
     this.rowHeight = opts.rowHeight;
+    this.overscanCount = opts.overscanCount;
     this.rowHeights = this.cumulativeHeights = new Int32Array(this.rowsCount);
     this.rowHeights.fill(this.rowHeight);
-    this.firstVisibleIndex = 0;
-    this.lastVisibleIndex = -1;
     this.rafId = null;
     this.onScroll = this.onScroll.bind(this);
     this.refresh = this.refresh.bind(this);
@@ -43,7 +42,12 @@ class ScrollBlum {
 
     container = container[0];
     this.containerHeight = container.offsetHeight;
-    container.appendChild(this.render());
+    container.appendChild(this.initRender());
+
+    this.scrollContainer = $('.scroll-container')[0];
+    this.topGap = $('.top-gap')[0];
+    this.bottomGap = $('.bottom-gap')[0];
+    this.contentElement = $('.content')[0];
 
     this.reBuildCumulativeHeight();
   }
@@ -75,31 +79,27 @@ class ScrollBlum {
   }
 
   refresh () {
-    const scrollContainer = $('.scroll-container')[0],
-          scrollTop = scrollContainer.scrollTop,
-          topGap = $('.top-gap')[0],
-          bottomGap = $('.bottom-gap')[0],
-          contentElement = $('.content')[0],
+    const scrollTop = this.scrollContainer.scrollTop,
           { firstVisibleIndex, lastVisibleIndex } = this.getVisibleIndexes(scrollTop);
 
     if (firstVisibleIndex < lastVisibleIndex) {
       // set the height of the gaps
-      css(topGap, {
+      css(this.topGap, {
         height: (this.cumulativeHeights[firstVisibleIndex - 1] || 0) + 'px'
       });
 
-      css(bottomGap, {
+      css(this.bottomGap, {
         height: (this.cumulativeHeights[this.cumulativeHeights.length - 1] - this.cumulativeHeights[lastVisibleIndex]) + 'px'
       });
 
       // find the visible items
       let visibleItems = [];
-      for (let i = firstVisibleIndex; i<= lastVisibleIndex; ++i) {
+      for (let i = firstVisibleIndex; i<= Math.min(lastVisibleIndex + this.overscanCount, this.rowsCount); ++i) {
         visibleItems.push(String(i));
       }
 
       // find items to remove
-      let items = Array.from(contentElement.children);
+      let items = Array.from(this.contentElement.children);
 
       for (let item of items) {
         let itemKey = item.dataset['key'];
@@ -109,10 +109,10 @@ class ScrollBlum {
       }
 
       // find items to add
-      let anchor = contentElement.firstChild;
+      let anchor = this.contentElement.firstChild;
       for (let item of visibleItems) {
         if (!anchor || item !== anchor.dataset['key']) {
-          contentElement.insertBefore(this.getRow(item), anchor);
+          this.contentElement.insertBefore(this.getRow(item), anchor);
         }
         else {
           anchor = anchor.nextSibling;
@@ -129,11 +129,11 @@ class ScrollBlum {
     }
   }
 
-  render () {
+  initRender () {
     const rows = [],
         { firstVisibleIndex, lastVisibleIndex } = this.getVisibleIndexes(1);
 
-    for (let i = firstVisibleIndex; i <= lastVisibleIndex; ++i) {
+    for (let i = firstVisibleIndex; i <= Math.min(lastVisibleIndex + this.overscanCount, this.rowsCount); ++i) {
       let row = this.getRow(i);
       rows.push(row);
     }

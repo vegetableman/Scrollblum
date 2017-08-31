@@ -8,6 +8,7 @@ domReady(() => {
   const sb = scrollBlum('.list', {
     rowsCount: 100,
     rowHeight: 150,
+    overscanCount: 5,
     rowRenderer: ((index) => {
       return h('div.scroll-item', index);
     })
