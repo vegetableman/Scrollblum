@@ -1,6 +1,6 @@
 {
   "name": "scrollblum",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A petite vanilla js infinite scroller",
   "main": "index.js",
   "scripts": {
