@@ -54,6 +54,7 @@ Options:
  - `rowsCount` The number of rows on the container
  - `rowHeight` The height of a single row
  - `rowRenderer` Should return the dom node to be rendered as a row (node)
+ - `overscanCount` The number of extra elements to render above/below the visible items (inspired by react-tiny-virtual-list)
 
  Methods:
 
