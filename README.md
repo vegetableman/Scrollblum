@@ -1,8 +1,8 @@
 # ScrollBlum
 
-A petite vanilla js infinite scroller. Derived from the Google Chrome Console Source.
+A petite vanilla js virtual list. Derived from the Google Chrome Console Source.
 
-The current state of frameworky infinite scroller libraries perplexed "The Blum" and was enough to make the man snap out of his perpetual medicated state, to build a tiny and performant vanilla js infinite scroller.
+The current state of frameworky virtual list libraries perplexed "The Blum" and was enough to make the man snap out of his perpetual medicated state, to build a tiny and performant vanilla js virtual list.
 
 <img src=https://raw.githubusercontent.com/vegetableman/Scrollblum/master/scrollblum.gif width="400"/>
 
