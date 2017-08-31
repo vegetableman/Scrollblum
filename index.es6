@@ -94,7 +94,7 @@ class ScrollBlum {
 
       // find the visible items
       let visibleItems = [];
-      for (let i = firstVisibleIndex; i<= Math.min(lastVisibleIndex + this.overscanCount, this.rowsCount); ++i) {
+      for (let i = Math.max(firstVisibleIndex - this.overscanCount, 0); i<= Math.min(lastVisibleIndex + this.overscanCount, this.rowsCount - 1); ++i) {
         visibleItems.push(String(i));
       }
 
@@ -133,7 +133,7 @@ class ScrollBlum {
     const rows = [],
         { firstVisibleIndex, lastVisibleIndex } = this.getVisibleIndexes(1);
 
-    for (let i = firstVisibleIndex; i <= Math.min(lastVisibleIndex + this.overscanCount, this.rowsCount); ++i) {
+    for (let i = Math.max(firstVisibleIndex - this.overscanCount, 0); i <= Math.min(lastVisibleIndex + this.overscanCount, this.rowsCount - 1); ++i) {
       let row = this.getRow(i);
       rows.push(row);
     }
