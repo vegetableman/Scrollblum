@@ -32,7 +32,7 @@ class ScrollBlum {
     this.rowRenderer = opts.rowRenderer;
     this.rowHeight = opts.rowHeight;
     this.overscanCount = opts.overscanCount || 0;
-    this.rowHeights = this.cumulativeHeights = new Int32Array(this.rowsCount);
+    this.rowHeights = new Int32Array(this.rowsCount);
     this.rowHeights.fill(this.rowHeight);
     this.rafId = null;
     this.onScroll = this.onScroll.bind(this);
@@ -122,6 +122,8 @@ class ScrollBlum {
   }
 
   reBuildCumulativeHeight () {
+    this.cumulativeHeights = new Int32Array(this.rowsCount);
+
     let height = 0;
     for (let i = 0; i < this.rowsCount; i++) {
       height += this.rowHeights[i];
