@@ -36,6 +36,7 @@ class ScrollBlum {
     this.rowHeights.fill(this.rowHeight);
     this.rafId = null;
     this.onScroll = this.onScroll.bind(this);
+    this.scrollToIndex = this.scrollToIndex.bind(this);
     this.refresh = this.refresh.bind(this);
     this.setRowHeight = this.setRowHeight.bind(this);
     this.renderedItems = [];
@@ -79,6 +80,10 @@ class ScrollBlum {
   onScroll (e) {
     if (this.rafId) { raf.cancel(this.rafId); }
     this.rafId = raf(this.refresh);
+  }
+
+  scrollToIndex (index) {
+    this.scrollContainer.scrollTop = this.cumulativeHeights[index];
   }
 
   refresh () {
@@ -151,9 +156,17 @@ class ScrollBlum {
           },
           onscroll: this.onScroll
         },
-        h('div.top-gap'),
+        h('div.top-gap', {
+          style: {
+            height: 0 + 'px'
+          }
+        }),
         h('div.content', rows),
-        h('div.bottom-gap')
+        h('div.bottom-gap', {
+          style: {
+            height: this.cumulativeHeights[this.cumulativeHeights.length - 1] + 'px'
+          }
+        })
       )
     );
   }
