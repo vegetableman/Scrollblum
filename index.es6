@@ -53,8 +53,11 @@ class ScrollBlum {
   }
 
   getVisibleIndexes (scrollTop) {
-    const firstVisibleIndex = Math.max(lowerBound(this.cumulativeHeights, scrollTop), 0),
-          lastVisibleIndex = Math.min(firstVisibleIndex + (Math.ceil(this.containerHeight / this.rowHeight) - 1), this.rowsCount - 1);
+    let firstVisibleIndex = Math.max(lowerBound(this.cumulativeHeights, scrollTop), 0),
+        lastVisibleIndex = Math.min(firstVisibleIndex + (Math.ceil(this.containerHeight / this.rowHeight) - 1), this.rowsCount - 1);
+
+    firstVisibleIndex = Math.max(firstVisibleIndex - this.overscanCount, 0);
+    lastVisibleIndex = Math.min(lastVisibleIndex + this.overscanCount, this.rowsCount - 1);
 
     return {
       firstVisibleIndex,
@@ -94,7 +97,7 @@ class ScrollBlum {
 
       // find the visible items
       let visibleItems = [];
-      for (let i = Math.max(firstVisibleIndex - this.overscanCount, 0); i<= Math.min(lastVisibleIndex + this.overscanCount, this.rowsCount - 1); ++i) {
+      for (let i = firstVisibleIndex; i<= lastVisibleIndex; ++i) {
         visibleItems.push(String(i));
       }
 
@@ -104,7 +107,7 @@ class ScrollBlum {
       for (let item of items) {
         let itemKey = item.dataset['key'];
         if (visibleItems.indexOf(itemKey) < 0) {
-          item.parentNode.removeChild(item);
+          this.contentElement.removeChild(item);
         }
       }
 
@@ -135,7 +138,7 @@ class ScrollBlum {
     const rows = [],
         { firstVisibleIndex, lastVisibleIndex } = this.getVisibleIndexes(1);
 
-    for (let i = Math.max(firstVisibleIndex - this.overscanCount, 0); i <= Math.min(lastVisibleIndex + this.overscanCount, this.rowsCount - 1); ++i) {
+    for (let i = firstVisibleIndex; i <= lastVisibleIndex; ++i) {
       let row = this.getRow(i);
       rows.push(row);
     }
