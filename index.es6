@@ -40,6 +40,8 @@ class ScrollBlum {
     this.setRowHeight = this.setRowHeight.bind(this);
     this.renderedItems = [];
 
+    this.reBuildCumulativeHeight();
+
     container = container[0];
     this.containerHeight = container.offsetHeight;
     container.appendChild(this.initRender());
@@ -48,8 +50,6 @@ class ScrollBlum {
     this.topGap = $('.top-gap')[0];
     this.bottomGap = $('.bottom-gap')[0];
     this.contentElement = $('.content')[0];
-
-    this.reBuildCumulativeHeight();
   }
 
   getVisibleIndexes (scrollTop) {
