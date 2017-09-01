@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "budo example/browser.js --css 'example/style.css' --live --open -- -t babelify",
-    "build": "browserify index.es6 -t babelify -o index.js",
-    "build-global": "browserify index.es6 -t babelify --standalone ScrollBlum > index.js",
+    "build": "browserify index.es6 -t babelify -o dist/index.js",
+    "build-global": "browserify index.es6 -t babelify --standalone ScrollBlum > dist/standalone-index.js",
     "pre-publish": "npm run build"
   },
   "author": "vegetableman <vegetablebot@gmail.com>",
