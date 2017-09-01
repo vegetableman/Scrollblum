@@ -55,8 +55,9 @@ Options:
  - `rowHeight` The height of a single row
  - `rowRenderer` Should return the dom node to be rendered as a row (node)
  - `overscanCount` The number of extra elements to render above/below the visible items (inspired by react-tiny-virtual-list)
+
+Methods:
+
+ - `setRowHeight(index, height)` Update the row height for a row at a particular index.
  - `scrollToIndex` The index in the list to scroll to
 
- Methods:
-
-  - `setRowHeight(index, height)` Update the row height for a row at a particular index.
