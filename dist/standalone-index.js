@@ -5,8 +5,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // Partially derived from Google Chrome Console Code ... Partially
-// License ..uhmm.. yeah.. whatever
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _hyperscript = require('hyperscript');
 
@@ -24,9 +23,22 @@ var _raf = require('raf');
 
 var _raf2 = _interopRequireDefault(_raf);
 
+var _debounce = require('debounce');
+
+var _debounce2 = _interopRequireDefault(_debounce);
+
+var _eventEmitterEs = require('event-emitter-es6');
+
+var _eventEmitterEs2 = _interopRequireDefault(_eventEmitterEs);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // Partially derived from Google Chrome Console Code ... Partially
+// License ..uhmm.. yeah.. whatever
 
 var lowerBound = function lowerBound(arr, value) {
   function defaultComparator(a, b) {
@@ -44,33 +56,45 @@ var lowerBound = function lowerBound(arr, value) {
   return right;
 };
 
-var ScrollBlum = function () {
+var ScrollBlum = function (_EventEmitter) {
+  _inherits(ScrollBlum, _EventEmitter);
+
   function ScrollBlum(container, opts) {
     _classCallCheck(this, ScrollBlum);
 
-    this.rowsCount = opts.rowsCount;
-    this.rowRenderer = opts.rowRenderer;
-    this.rowHeight = opts.rowHeight;
-    this.overscanCount = opts.overscanCount || 0;
-    this.rowHeights = new Int32Array(this.rowsCount);
-    this.rowHeights.fill(this.rowHeight);
-    this.rafId = null;
-    this.onScroll = this.onScroll.bind(this);
-    this.scrollToIndex = this.scrollToIndex.bind(this);
-    this.refresh = this.refresh.bind(this);
-    this.setRowHeight = this.setRowHeight.bind(this);
-    this.renderedItems = [];
+    var _this = _possibleConstructorReturn(this, (ScrollBlum.__proto__ || Object.getPrototypeOf(ScrollBlum)).call(this));
 
-    this.reBuildCumulativeHeight();
+    if (!container || !(0, _queryselectorall2.default)(container).length) throw new Error('Please provide a valid container');
 
-    container = container[0];
-    this.containerHeight = container.offsetHeight;
-    container.appendChild(this.initRender());
+    _this.rowsCount = opts.rowsCount;
+    _this.rowRenderer = opts.rowRenderer;
+    _this.rowHeight = opts.rowHeight;
+    _this.overscanCount = opts.overscanCount || 0;
 
-    this.scrollContainer = (0, _queryselectorall2.default)('.scroll-container')[0];
-    this.topGap = (0, _queryselectorall2.default)('.top-gap')[0];
-    this.bottomGap = (0, _queryselectorall2.default)('.bottom-gap')[0];
-    this.contentElement = (0, _queryselectorall2.default)('.content')[0];
+    _this.rowHeights = new Int32Array(_this.rowsCount);
+    _this.rowHeights.fill(_this.rowHeight);
+    _this.rafId = null;
+    _this.onScroll = _this.onScroll.bind(_this);
+    _this.scrollToIndex = _this.scrollToIndex.bind(_this);
+    _this.refresh = _this.refresh.bind(_this);
+    _this.setRowHeight = _this.setRowHeight.bind(_this);
+    _this.onScrollEnd = _this.onScrollEnd.bind(_this);
+    _this.debouncedScrollEnd = (0, _debounce2.default)(_this.onScrollEnd, 150);
+    _this.renderedItems = [];
+
+    _this.reBuildCumulativeHeight();
+
+    container = (0, _queryselectorall2.default)(container)[0];
+    _this.containerHeight = container.offsetHeight;
+
+    var scrollContainer = _this.initRender();
+    container.appendChild(scrollContainer);
+
+    _this.scrollContainer = scrollContainer;
+    _this.topGap = _this.scrollContainer.children[0];
+    _this.contentElement = _this.scrollContainer.children[1];
+    _this.bottomGap = _this.scrollContainer.children[2];
+    return _this;
   }
 
   _createClass(ScrollBlum, [{
@@ -107,6 +131,12 @@ var ScrollBlum = function () {
         _raf2.default.cancel(this.rafId);
       }
       this.rafId = (0, _raf2.default)(this.refresh);
+      this.debouncedScrollEnd();
+    }
+  }, {
+    key: 'onScrollEnd',
+    value: function onScrollEnd() {
+      this.emit('scroll-end');
     }
   }, {
     key: 'scrollToIndex',
@@ -246,19 +276,11 @@ var ScrollBlum = function () {
   }]);
 
   return ScrollBlum;
-}();
+}(_eventEmitterEs2.default);
 
-exports.default = function () {
-  return function (container) {
-    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+exports.default = ScrollBlum;
 
-    if (!container) throw new Error('Please provide a container');
-
-    return new ScrollBlum((0, _queryselectorall2.default)(container), opts);
-  };
-}();
-
-},{"css-styler":5,"hyperscript":6,"queryselectorall":11,"raf":12}],2:[function(require,module,exports){
+},{"css-styler":5,"debounce":6,"event-emitter-es6":7,"hyperscript":8,"queryselectorall":13,"raf":14}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 /*!
@@ -469,7 +491,7 @@ function isTruthy(value) {
     return !!value
 }
 
-},{"indexof":7}],5:[function(require,module,exports){
+},{"indexof":9}],5:[function(require,module,exports){
 "use strict";
 
 var CSSStyler = function () {
@@ -533,6 +555,315 @@ var CSSStyler = function () {
 
 module.exports = new CSSStyler();
 },{}],6:[function(require,module,exports){
+/**
+ * Returns a function, that, as long as it continues to be invoked, will not
+ * be triggered. The function will be called after it stops being called for
+ * N milliseconds. If `immediate` is passed, trigger the function on the
+ * leading edge, instead of the trailing. The function also has a property 'clear' 
+ * that is a function which will clear the timer to prevent previously scheduled executions. 
+ *
+ * @source underscore.js
+ * @see http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
+ * @param {Function} function to wrap
+ * @param {Number} timeout in ms (`100`)
+ * @param {Boolean} whether to execute at the beginning (`false`)
+ * @api public
+ */
+
+module.exports = function debounce(func, wait, immediate){
+  var timeout, args, context, timestamp, result;
+  if (null == wait) wait = 100;
+
+  function later() {
+    var last = Date.now() - timestamp;
+
+    if (last < wait && last >= 0) {
+      timeout = setTimeout(later, wait - last);
+    } else {
+      timeout = null;
+      if (!immediate) {
+        result = func.apply(context, args);
+        context = args = null;
+      }
+    }
+  };
+
+  var debounced = function(){
+    context = this;
+    args = arguments;
+    timestamp = Date.now();
+    var callNow = immediate && !timeout;
+    if (!timeout) timeout = setTimeout(later, wait);
+    if (callNow) {
+      result = func.apply(context, args);
+      context = args = null;
+    }
+
+    return result;
+  };
+
+  debounced.clear = function() {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+  };
+
+  return debounced;
+};
+
+},{}],7:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var DEFAULT_VALUES = {
+    emitDelay: 10,
+    strictMode: false
+};
+
+/**
+ * @typedef {object} EventEmitterListenerFunc
+ * @property {boolean} once
+ * @property {function} fn
+ */
+
+/**
+ * @class EventEmitter
+ *
+ * @private
+ * @property {Object.<string, EventEmitterListenerFunc[]>} _listeners
+ * @property {string[]} events
+ */
+
+var EventEmitter = function () {
+
+    /**
+     * @constructor
+     * @param {{}}      [opts]
+     * @param {number}  [opts.emitDelay = 10] - Number in ms. Specifies whether emit will be sync or async. By default - 10ms. If 0 - fires sync
+     * @param {boolean} [opts.strictMode = false] - is true, Emitter throws error on emit error with no listeners
+     */
+
+    function EventEmitter() {
+        var opts = arguments.length <= 0 || arguments[0] === undefined ? DEFAULT_VALUES : arguments[0];
+
+        _classCallCheck(this, EventEmitter);
+
+        var emitDelay = void 0,
+            strictMode = void 0;
+
+        if (opts.hasOwnProperty('emitDelay')) {
+            emitDelay = opts.emitDelay;
+        } else {
+            emitDelay = DEFAULT_VALUES.emitDelay;
+        }
+        this._emitDelay = emitDelay;
+
+        if (opts.hasOwnProperty('strictMode')) {
+            strictMode = opts.strictMode;
+        } else {
+            strictMode = DEFAULT_VALUES.strictMode;
+        }
+        this._strictMode = strictMode;
+
+        this._listeners = {};
+        this.events = [];
+    }
+
+    /**
+     * @protected
+     * @param {string} type
+     * @param {function} listener
+     * @param {boolean} [once = false]
+     */
+
+
+    _createClass(EventEmitter, [{
+        key: '_addListenner',
+        value: function _addListenner(type, listener, once) {
+            if (typeof listener !== 'function') {
+                throw TypeError('listener must be a function');
+            }
+
+            if (this.events.indexOf(type) === -1) {
+                this._listeners[type] = [{
+                    once: once,
+                    fn: listener
+                }];
+                this.events.push(type);
+            } else {
+                this._listeners[type].push({
+                    once: once,
+                    fn: listener
+                });
+            }
+        }
+
+        /**
+         * Subscribes on event type specified function
+         * @param {string} type
+         * @param {function} listener
+         */
+
+    }, {
+        key: 'on',
+        value: function on(type, listener) {
+            this._addListenner(type, listener, false);
+        }
+
+        /**
+         * Subscribes on event type specified function to fire only once
+         * @param {string} type
+         * @param {function} listener
+         */
+
+    }, {
+        key: 'once',
+        value: function once(type, listener) {
+            this._addListenner(type, listener, true);
+        }
+
+        /**
+         * Removes event with specified type. If specified listenerFunc - deletes only one listener of specified type
+         * @param {string} eventType
+         * @param {function} [listenerFunc]
+         */
+
+    }, {
+        key: 'off',
+        value: function off(eventType, listenerFunc) {
+            var _this = this;
+
+            var typeIndex = this.events.indexOf(eventType);
+            var hasType = eventType && typeIndex !== -1;
+
+            if (hasType) {
+                if (!listenerFunc) {
+                    delete this._listeners[eventType];
+                    this.events.splice(typeIndex, 1);
+                } else {
+                    (function () {
+                        var removedEvents = [];
+                        var typeListeners = _this._listeners[eventType];
+
+                        typeListeners.forEach(
+                        /**
+                         * @param {EventEmitterListenerFunc} fn
+                         * @param {number} idx
+                         */
+                        function (fn, idx) {
+                            if (fn.fn === listenerFunc) {
+                                removedEvents.unshift(idx);
+                            }
+                        });
+
+                        removedEvents.forEach(function (idx) {
+                            typeListeners.splice(idx, 1);
+                        });
+
+                        if (!typeListeners.length) {
+                            _this.events.splice(typeIndex, 1);
+                            delete _this._listeners[eventType];
+                        }
+                    })();
+                }
+            }
+        }
+
+        /**
+         * Applies arguments to specified event type
+         * @param {string} eventType
+         * @param {*[]} eventArguments
+         * @protected
+         */
+
+    }, {
+        key: '_applyEvents',
+        value: function _applyEvents(eventType, eventArguments) {
+            var typeListeners = this._listeners[eventType];
+
+            if (!typeListeners || !typeListeners.length) {
+                if (this._strictMode) {
+                    throw 'No listeners specified for event: ' + eventType;
+                } else {
+                    return;
+                }
+            }
+
+            var removableListeners = [];
+            typeListeners.forEach(function (eeListener, idx) {
+                eeListener.fn.apply(null, eventArguments);
+                if (eeListener.once) {
+                    removableListeners.unshift(idx);
+                }
+            });
+
+            removableListeners.forEach(function (idx) {
+                typeListeners.splice(idx, 1);
+            });
+        }
+
+        /**
+         * Emits event with specified type and params.
+         * @param {string} type
+         * @param eventArgs
+         */
+
+    }, {
+        key: 'emit',
+        value: function emit(type) {
+            var _this2 = this;
+
+            for (var _len = arguments.length, eventArgs = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                eventArgs[_key - 1] = arguments[_key];
+            }
+
+            if (this._emitDelay) {
+                setTimeout(function () {
+                    _this2._applyEvents.call(_this2, type, eventArgs);
+                }, this._emitDelay);
+            } else {
+                this._applyEvents(type, eventArgs);
+            }
+        }
+
+        /**
+         * Emits event with specified type and params synchronously.
+         * @param {string} type
+         * @param eventArgs
+         */
+
+    }, {
+        key: 'emitSync',
+        value: function emitSync(type) {
+            for (var _len2 = arguments.length, eventArgs = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+                eventArgs[_key2 - 1] = arguments[_key2];
+            }
+
+            this._applyEvents(type, eventArgs);
+        }
+
+        /**
+         * Destroys EventEmitter
+         */
+
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            this._listeners = {};
+            this.events = [];
+        }
+    }]);
+
+    return EventEmitter;
+}();
+
+module.exports = EventEmitter;
+
+},{}],8:[function(require,module,exports){
 var split = require('browser-split')
 var ClassList = require('class-list')
 
@@ -694,7 +1025,7 @@ function isArray (arr) {
 
 
 
-},{"browser-split":3,"class-list":4,"html-element":2}],7:[function(require,module,exports){
+},{"browser-split":3,"class-list":4,"html-element":2}],9:[function(require,module,exports){
 
 var indexOf = [].indexOf;
 
@@ -705,7 +1036,7 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = isNode
 
 function isNode (val) {
@@ -717,7 +1048,7 @@ function isNode (val) {
         (typeof val.nodeName === 'string')
 }
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (process){
 // Generated by CoffeeScript 1.12.2
 (function() {
@@ -757,7 +1088,7 @@ function isNode (val) {
 
 
 }).call(this,require('_process'))
-},{"_process":10}],10:[function(require,module,exports){
+},{"_process":12}],12:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -943,7 +1274,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var isDom = require('is-dom');
 
 function querySelectorAll(selector) {
@@ -953,7 +1284,7 @@ function querySelectorAll(selector) {
 
 module.exports = querySelectorAll;
 
-},{"is-dom":8}],12:[function(require,module,exports){
+},{"is-dom":10}],14:[function(require,module,exports){
 (function (global){
 var now = require('performance-now')
   , root = typeof window === 'undefined' ? global : window
@@ -1029,5 +1360,5 @@ module.exports.polyfill = function() {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"performance-now":9}]},{},[1])(1)
+},{"performance-now":11}]},{},[1])(1)
 });
