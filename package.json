@@ -22,6 +22,8 @@
   },
   "dependencies": {
     "css-styler": "^1.0.0",
+    "debounce": "^1.0.2",
+    "event-emitter-es6": "^1.1.5",
     "hyperscript": "^2.0.2",
     "queryselectorall": "^0.1.0",
     "raf": "^3.3.2"

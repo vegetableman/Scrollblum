@@ -13,7 +13,7 @@ The current state of frameworky virtual list libraries perplexed "The Blum" and 
 
 const scrollBlum = require('scrollblum');
 
-const sb = scrollBlum('.list', {
+const sb = new scrollBlum('.list', {
   rowsCount: 100,
   rowHeight: 150,
   rowRenderer: ((index) => {
@@ -60,4 +60,8 @@ Methods:
 
  - `setRowHeight(index, height)` Update the row height for a row at a particular index.
  - `scrollToIndex` The index in the list to scroll to
+
+Events:
+  
+  - `scroll-end` Emitted at end of the scroll
 

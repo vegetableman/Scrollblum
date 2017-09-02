@@ -5,6 +5,8 @@ import h from 'hyperscript'
 import $ from 'queryselectorall'
 import css from 'css-styler'
 import raf from 'raf'
+import debounce from 'debounce'
+import EventEmitter from 'event-emitter-es6'
 
 const lowerBound = (arr, value) => {
   function defaultComparator(a, b) {
@@ -26,12 +28,18 @@ const lowerBound = (arr, value) => {
 };
 
 
-class ScrollBlum {
+class ScrollBlum extends EventEmitter {
   constructor (container, opts) {
+    super();
+
+    if (!container || !$(container).length)
+      throw new Error('Please provide a valid container');
+
     this.rowsCount = opts.rowsCount;
     this.rowRenderer = opts.rowRenderer;
     this.rowHeight = opts.rowHeight;
     this.overscanCount = opts.overscanCount || 0;
+
     this.rowHeights = new Int32Array(this.rowsCount);
     this.rowHeights.fill(this.rowHeight);
     this.rafId = null;
@@ -39,18 +47,22 @@ class ScrollBlum {
     this.scrollToIndex = this.scrollToIndex.bind(this);
     this.refresh = this.refresh.bind(this);
     this.setRowHeight = this.setRowHeight.bind(this);
+    this.onScrollEnd = this.onScrollEnd.bind(this);
+    this.debouncedScrollEnd = debounce(this.onScrollEnd, 150);
     this.renderedItems = [];
 
     this.reBuildCumulativeHeight();
 
-    container = container[0];
+    container = $(container)[0];
     this.containerHeight = container.offsetHeight;
-    container.appendChild(this.initRender());
 
-    this.scrollContainer = $('.scroll-container')[0];
-    this.topGap = $('.top-gap')[0];
-    this.bottomGap = $('.bottom-gap')[0];
-    this.contentElement = $('.content')[0];
+    let scrollContainer = this.initRender()
+    container.appendChild(scrollContainer);
+
+    this.scrollContainer = scrollContainer;
+    this.topGap = this.scrollContainer.children[0];
+    this.contentElement =  this.scrollContainer.children[1];
+    this.bottomGap = this.scrollContainer.children[2];
   }
 
   getVisibleIndexes (scrollTop) {
@@ -80,6 +92,11 @@ class ScrollBlum {
   onScroll (e) {
     if (this.rafId) { raf.cancel(this.rafId); }
     this.rafId = raf(this.refresh);
+    this.debouncedScrollEnd();
+  }
+
+  onScrollEnd () {
+    this.emit('scroll-end');
   }
 
   scrollToIndex (index) {
@@ -172,11 +189,4 @@ class ScrollBlum {
   }
 }
 
-export default (() => {
-    return (container, opts = {}) => {
-      if (!container)
-        throw new Error('Please provide a container');
-
-      return new ScrollBlum($(container), opts);
-    };
-})();
+export default ScrollBlum;
